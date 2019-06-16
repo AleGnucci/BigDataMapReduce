@@ -1,3 +1,0 @@
--ottenere i tags in ordine decrescente di frequenza d'uso relativi ai video con un alto rapporto visualizzazioni/commenti (da fare con mapreduce)
-
--scoprire quali sono, per ogni nazione, i 10 canali con il numero maggiore di likes in media

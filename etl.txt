@@ -1,0 +1,26 @@
+//apri putty, usa isi-vclust4.csr.unibo.it , con username agnucci
+
+//creazione cartella utente
+hdfs dfs -mkdir /user/agnucci
+
+//poi carica i files in una cartella sul cluster con winSCP
+
+//poi vai in quella cartella con il comando cd, dentro alla shell di putty
+
+//caricamento di files su hdfs
+hadoop fs -cp ./CAvideos.csv ./DEvideos.csv ./FRvideos.csv ./GBvideos.csv ./INvideos.csv ./JPvideos.csv ./KRvideos.csv ./MXvideos.csv ./RUvideos.csv ./USvideos.csv /user/agnucci/datasets/
+
+//con spark2-shell (unione di files e conversione a parquet):
+
+val CArdd = sc.textFile("/user/agnucci/datasets/CAvideos.csv")
+val DErdd = sc.textFile("/user/agnucci/datasets/DEvideos.csv")
+val FRrdd = sc.textFile("/user/agnucci/datasets/FRvideos.csv")
+val GBrdd = sc.textFile("/user/agnucci/datasets/GBvideos.csv")
+val INrdd = sc.textFile("/user/agnucci/datasets/INvideos.csv")
+val JPrdd = sc.textFile("/user/agnucci/datasets/JPvideos.csv")
+val KRrdd = sc.textFile("/user/agnucci/datasets/KRvideos.csv")
+val MXrdd = sc.textFile("/user/agnucci/datasets/MXvideos.csv")
+val RUrdd = sc.textFile("/user/agnucci/datasets/RUvideos.csv")
+val USrdd = sc.textFile("/user/agnucci/datasets/USvideos.csv")
+val bigRdd = sc.union(Seq(CArdd, DErdd, FRrdd, GBrdd, INrdd, JPrdd, KRrdd, MXrdd, RUrdd, USrdd))
+bigRdd.coalesce(1).write.parquet('/user/agnucci/datasets/youtubeDataset.parquet)
