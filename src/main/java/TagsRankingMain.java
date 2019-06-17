@@ -8,7 +8,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -23,6 +22,9 @@ public class TagsRankingMain {
         job2(conf, args);
     }
 
+    /**
+     * This is the main job and the first to be executed: it calculates the required result, but doe not sort it.
+    * */
     private static void job1(Configuration conf, String[] args) throws Exception{
         Job job = Job.getInstance(conf, "job that calculates the required information about the tags");
 
@@ -52,6 +54,10 @@ public class TagsRankingMain {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
+
+    /**
+     * This job gets executed after the first one and it just sorts the results using the videos count.
+     * */
     private static void job2(Configuration conf, String[] args) throws Exception {
         Path outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(new Configuration());
