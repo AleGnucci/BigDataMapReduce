@@ -1,7 +1,10 @@
 //apri putty, usa isi-vclust4.csr.unibo.it , con username agnucci
 
-//creazione cartella utente
+//creazione cartella utente e altre
 hdfs dfs -mkdir /user/agnucci
+hdfs dfs -mkdir /user/agnucci/datasets
+hdfs dfs -mkdir /user/agnucci/outputMR
+hdfs dfs -mkdir /user/agnucci/outputSpark
 
 //poi carica i files in una cartella sul cluster con winSCP
 

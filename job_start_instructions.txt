@@ -1,0 +1,13 @@
+//apri intellij, importa il progetto BigDataMapReduce
+
+//cambia le dipendenze di hadoop, mettendo al posto di quelle in build.gradle il jar trovato in http://isi-vclust0.csr.unibo.it:50070/webhdfs/v1/bigdata/jars/hadoop-min-jars.zip?op=OPEN
+
+//crea il jar con intellij, senza includere le librerie di hadoop
+
+//apri la shell con putty, specificando isi-vclust4.csr.unibo.it , con username agnucci
+
+//usa winscp per spostare il jar da locale al cluster
+
+//lancia il jar, con il comando hadoop jar BigDataMapReduce.jar TagsRankingMain /user/agnucci/datasets/youtubeDataset.parquet /user/agnucci/outputMR
+
+//aggiusta il codice se necessario
