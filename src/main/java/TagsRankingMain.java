@@ -54,7 +54,6 @@ public class TagsRankingMain {
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 
-
     /**
      * This job gets executed after the first one and it just sorts the results using the videos count.
      * */
