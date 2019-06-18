@@ -23,7 +23,7 @@ public class TagsRankingMain {
     }
 
     /**
-     * This is the main job and the first to be executed: it calculates the required result, but doe not sort it.
+     * This is the main job and the first to be executed: it calculates the required result, but does not sort it.
     * */
     private static void job1(Configuration conf, String[] args) throws Exception{
         Job job = Job.getInstance(conf, "job that calculates the required information about the tags");
@@ -67,8 +67,9 @@ public class TagsRankingMain {
 
         Job job2 = Job.getInstance(conf, "sorting job");
         job2.setJarByClass(TagsRankingMain.class);
-        job2.setMapperClass(KeyValueSwappingMapper.class);
-        job2.setNumReduceTasks(1);
+        job2.setMapperClass(KeyValueSwappingMapper.class); //mapper that swaps keys with values
+        job2.setNumReduceTasks(1); //sets only one reducer, so there is only one output file
+        //sorts the key-value pairs before they arrive to the reducer
         job2.setSortComparatorClass(CompositeLongComparator.class);
         job2.setOutputKeyClass(CompositeLongWritable.class);
         job2.setOutputValueClass(Text.class);

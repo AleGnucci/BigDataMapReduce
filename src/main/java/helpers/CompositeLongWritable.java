@@ -6,11 +6,12 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ * Writable that contains two long fields. Comparisons on objects of this type are done using only the second field.
+ * */
 public class CompositeLongWritable implements WritableComparable<CompositeLong>, CompositeLong {
-    private long value1 = 0;
-    private long value2 = 0; //comparisons on objects of this class are done considering only this field
-
-    public CompositeLongWritable() {}
+    private long value1;
+    private long value2; //comparisons on objects of this class are done considering only this field
 
     public CompositeLongWritable(long value1, long value2) {
         this.value1 = value1;
@@ -27,11 +28,6 @@ public class CompositeLongWritable implements WritableComparable<CompositeLong>,
     public void write(DataOutput out) throws IOException {
         out.writeLong(value1);
         out.writeLong(value2);
-    }
-
-    public void merge(CompositeLongWritable other) {
-        this.value1 += other.value1;
-        this.value2 += other.value2;
     }
 
     @Override
