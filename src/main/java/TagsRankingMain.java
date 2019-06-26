@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.parquet.hadoop.example.ExampleInputFormat;
 
 public class TagsRankingMain {
 
@@ -46,6 +47,7 @@ public class TagsRankingMain {
         job.setReducerClass(RankingReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
+        job.setInputFormatClass(ExampleInputFormat.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
         FileInputFormat.addInputPath(job, inputPath);
