@@ -11,19 +11,21 @@ hdfs dfs -mkdir /user/agnucci/outputSpark
 //poi vai in quella cartella con il comando cd, dentro alla shell di putty
 
 //caricamento di files su hdfs
-hadoop fs -cp ./CAvideos.csv ./DEvideos.csv ./FRvideos.csv ./GBvideos.csv ./INvideos.csv ./JPvideos.csv ./KRvideos.csv ./MXvideos.csv ./RUvideos.csv ./USvideos.csv /user/agnucci/datasets/
+hadoop fs -put ./ /user/agnucci/datasets/
 
 //con spark2-shell (unione di files e conversione a parquet):
 
-val CArdd = sc.textFile("hdfs:/user/agnucci/datasets/CAvideos.csv")
-val DErdd = sc.textFile("hdfs:/user/agnucci/datasets/DEvideos.csv")
-val FRrdd = sc.textFile("hdfs:/user/agnucci/datasets/FRvideos.csv")
-val GBrdd = sc.textFile("hdfs:/user/agnucci/datasets/GBvideos.csv")
-val INrdd = sc.textFile("hdfs:/user/agnucci/datasets/INvideos.csv")
-val JPrdd = sc.textFile("hdfs:/user/agnucci/datasets/JPvideos.csv")
-val KRrdd = sc.textFile("hdfs:/user/agnucci/datasets/KRvideos.csv")
-val MXrdd = sc.textFile("hdfs:/user/agnucci/datasets/MXvideos.csv")
-val RUrdd = sc.textFile("hdfs:/user/agnucci/datasets/RUvideos.csv")
-val USrdd = sc.textFile("hdfs:/user/agnucci/datasets/USvideos.csv")
+val sqlContext= new org.apache.spark.sql.SQLContext(sc)
+import sqlContext.implicits._
+val CArdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/CAvideos.csv")
+val DErdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/DEvideos.csv")
+val FRrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/FRvideos.csv")
+val GBrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/GBvideos.csv")
+val INrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/INvideos.csv")
+val JPrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/JPvideos.csv")
+val KRrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/KRvideos.csv")
+val MXrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/MXvideos.csv")
+val RUrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/RUvideos.csv")
+val USrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/USvideos.csv")
 val bigRdd = sc.union(Seq(CArdd, DErdd, FRrdd, GBrdd, INrdd, JPrdd, KRrdd, MXrdd, RUrdd, USrdd))
-bigRdd.coalesce(1).write.parquet('hdfs:/user/agnucci/datasets/youtubeDataset.parquet)
+bigRdd.coalesce(1).toDF.write.parquet("hdfs:/user/agnucci/datasets/youtubeDataset")

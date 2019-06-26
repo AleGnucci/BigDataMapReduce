@@ -1,14 +1,16 @@
 package job1;
 
+import helpers.FieldDescription;
+import helpers.ParquetReader;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.parquet.example.data.Group;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,16 +18,18 @@ import java.util.concurrent.TimeUnit;
  * inside that record.
  * The key is the tag and the value is the trending time, calculated by computing the difference between dates in days.
  * */
-public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritable> {
-    public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-        String[] record = value.toString().split("\n")[1].split(": ");
+public class RankingMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
 
-        String[] tags = record[6].split("\\|");
+    private static List<FieldDescription> expectedFields = null;
+
+    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        List<String> record = ParquetReader.getInstance().readParquetRecord(value, context, expectedFields);
+        String[] tags = record.get(6).split("\\|");
         for (String tag : tags) {
             if(tags[14].equals("False")){
                 continue;
             }
-            Long trendingTime = calculateTrendingTime(record[5], record[1]);
+            Long trendingTime = calculateTrendingTime(record.get(5), record.get(1));
             if(trendingTime == null) {
                 continue;
             }
