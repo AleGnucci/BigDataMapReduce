@@ -24,7 +24,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
         List<String> record = extractRecord(value);
         String[] tags = record.get(6).split("\\|");
         for (String tag : tags) {
-            if(tags[14].equals("False")){
+            if(record.get(14).equals("False")){
                 continue;
             }
             Long trendingTime = calculateTrendingTime(record.get(5), record.get(1));

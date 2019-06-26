@@ -13,6 +13,9 @@ hdfs dfs -mkdir /user/agnucci/outputSpark
 //caricamento di files su hdfs
 hadoop fs -put ./ /user/agnucci/datasets/
 
+//cancellazione di vecchia versione del dataset unito:
+hadoop fs -rmr /user/agnucci/datasets/youtubeDataset
+
 //con spark2-shell (unione di files e conversione a parquet):
 
 val sqlContext= new org.apache.spark.sql.SQLContext(sc)
@@ -30,22 +33,20 @@ val USrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/USvideos.csv")
 val bigRdd = sc.union(Seq(CArdd, DErdd, FRrdd, GBrdd, INrdd, JPrdd, KRrdd, MXrdd, RUrdd, USrdd))
 val schema = new StructType()
   .add(StructField("video_id", StringType, true))
-  .add(StructField("trending_date", DoubleType, true))
-  .add(StructField("title", DoubleType, true))
-  .add(StructField("channel_title", DoubleType, true))
-  .add(StructField("category_id", DoubleType, true))
-  .add(StructField("publish_time", DoubleType, true))
-  .add(StructField("tags", DoubleType, true))
-  .add(StructField("views", DoubleType, true))
-  .add(StructField("likes", DoubleType, true))
-  .add(StructField("dislikes", DoubleType, true))
-  .add(StructField("comment_count", DoubleType, true))
-  .add(StructField("thumbnail_link", DoubleType, true))
-  .add(StructField("comments_disabled", DoubleType, true))
-  .add(StructField("ratings_disabled", DoubleType, true))
-  .add(StructField("video_error_or_removed", DoubleType, true))
-  .add(StructField("description", DoubleType, true))
+  .add(StructField("trending_date", StringType, true))
+  .add(StructField("title", StringType, true))
+  .add(StructField("channel_title", StringType, true))
+  .add(StructField("category_id", IntegerType, true))
+  .add(StructField("publish_time", StringType, true))
+  .add(StructField("tags", StringType, true))
+  .add(StructField("views", LongType, true))
+  .add(StructField("likes", LongType, true))
+  .add(StructField("dislikes", LongType, true))
+  .add(StructField("comment_count", LongType, true))
+  .add(StructField("thumbnail_link", StringType, true))
+  .add(StructField("comments_disabled", BooleanType, true))
+  .add(StructField("ratings_disabled", BooleanType, true))
+  .add(StructField("video_error_or_removed", BooleanType, true))
+  .add(StructField("description", StringType, true))
 val outputRdd = bigRdd.coalesce(1)
 spark.createDataFrame(outputRdd, schema).write.parquet("hdfs:/user/agnucci/datasets/youtubeDataset")
-
-video_id,trending_date,title,channel_title,category_id,publish_time,tags,views,likes,dislikes,comment_count,thumbnail_link,comments_disabled,ratings_disabled,video_error_or_removed,description
