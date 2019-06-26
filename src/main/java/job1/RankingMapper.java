@@ -1,7 +1,6 @@
 package job1;
 
-import helpers.FieldDescription;
-import helpers.ParquetReader;
+import org.apache.parquet.example.data.Group;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -9,6 +8,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +18,10 @@ import java.util.concurrent.TimeUnit;
  * inside that record.
  * The key is the tag and the value is the trending time, calculated by computing the difference between dates in days.
  * */
-public class RankingMapper extends Mapper<LongWritable, Text, Text, LongWritable> {
+public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritable> {
 
-    private static List<FieldDescription> expectedFields = null;
-
-    public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        List<String> record = ParquetReader.getInstance().readParquetRecord(value, context, expectedFields);
+    public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        List<String> record = extractRecord(value);
         String[] tags = record.get(6).split("\\|");
         for (String tag : tags) {
             if(tags[14].equals("False")){
@@ -35,6 +33,18 @@ public class RankingMapper extends Mapper<LongWritable, Text, Text, LongWritable
             }
             context.write(new Text(tag), new LongWritable(trendingTime));
         }
+    }
+
+    /**
+     * Returns the values of each field in the record.
+     * */
+    private List<String> extractRecord(Group value){
+        String[] fields = value.toString().split("\n");
+        List<String> record = new ArrayList<>();
+        for (String field : fields) {
+            record.add(field.split(": ")[1]);
+        }
+        return record;
     }
 
     /**
