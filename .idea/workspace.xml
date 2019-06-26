@@ -6,9 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="78036363-731b-42a2-b25e-559aade93099" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/job_start_instructions.txt" beforeDir="false" afterPath="$PROJECT_DIR$/job_start_instructions.txt" afterDir="false" />
-    </list>
+    <list default="true" id="78036363-731b-42a2-b25e-559aade93099" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/classes/" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -312,12 +310,12 @@
       <workItem from="1560845078185" duration="5369000" />
       <workItem from="1560867551616" duration="1210000" />
       <workItem from="1561536630402" duration="5013000" />
-      <workItem from="1561557760568" duration="3080000" />
+      <workItem from="1561557760568" duration="3680000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="35271000" />
+    <option name="totallyTimeSpent" value="35871000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="2125" height="1440" extended-state="4" />
