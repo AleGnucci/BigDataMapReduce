@@ -8,9 +8,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,13 +19,15 @@ import java.util.concurrent.TimeUnit;
 public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritable> {
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-        List<String> record = extractRecord(value);
-        String[] tags = record.get(6).split("\\|");
+        //List<String> record = extractRecord(value);
+        String[] tags = value.getString("tags", 0).split("\\|"); //TODO: indexOutOfBoundsException
         for (String tag : tags) {
-            if(record.get(14).equals("False")){
+            String doesVideoHaveErrors = value.getString("video_error_or_removed", 0);
+            if(doesVideoHaveErrors.equals("False") || doesVideoHaveErrors.equals("FALSE")){
                 continue;
             }
-            Long trendingTime = calculateTrendingTime(record.get(5), record.get(1));
+            Long trendingTime = calculateTrendingTime(value.getString("publish_time", 0),
+                    value.getString("trending_date", 0));
             if(trendingTime == null) {
                 continue;
             }
@@ -38,6 +38,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
     /**
      * Returns the values of each field in the record.
      * */
+    /*
     private List<String> extractRecord(Group value){
         String[] fields = value.toString().split("\n");
         List<String> record = new ArrayList<>();
@@ -46,6 +47,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
         }
         return record;
     }
+    */
 
     /**
      * Parses the two dates and calculates the difference in days.
@@ -54,7 +56,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
         Date publishTime;
         Date trendingDate;
         try {
-            publishTime = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SSSz").parse(publishTimeString);
+            publishTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(publishTimeString);
             trendingDate = new SimpleDateFormat("yy.dd.MM").parse(trendingTimeString);
         } catch (ParseException e) {
             return null;
@@ -65,7 +67,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
     /**
      * Calculates the date difference in days.
      * */
-    private long dateDaysDifference(Date beforeDate, Date afterDate){
+    private long dateDaysDifference(Date beforeDate, Date afterDate) {
         long millisecondsDifference = Math.abs(afterDate.getTime() - beforeDate.getTime());
         return TimeUnit.DAYS.convert(millisecondsDifference, TimeUnit.MILLISECONDS);
     }
