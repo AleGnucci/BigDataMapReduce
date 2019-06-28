@@ -8,6 +8,6 @@
 
 //usa winscp per spostare il jar da locale al cluster
 
-//lancia il jar, con il comando hadoop jar Job1MapReduce.jar TagsRankingMain /user/agnucci/datasets/youtubeDataset/NOMEFILE.parquet /user/agnucci/outputMR
+//lancia il jar, con il comando hadoop jar Job1MapReduce.jar TagsRankingMain /user/agnucci/datasets/youtubeDataset /user/agnucci/outputMR
 
 //aggiusta il codice se necessario

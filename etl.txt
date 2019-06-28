@@ -20,33 +20,27 @@ hadoop fs -rmr /user/agnucci/datasets/youtubeDataset
 
 val sqlContext= new org.apache.spark.sql.SQLContext(sc)
 import sqlContext.implicits._
-val CArdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/CAvideos.csv")
-val DErdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/DEvideos.csv")
-val FRrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/FRvideos.csv")
-val GBrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/GBvideos.csv")
-val INrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/INvideos.csv")
-val JPrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/JPvideos.csv")
-val KRrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/KRvideos.csv")
-val MXrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/MXvideos.csv")
-val RUrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/RUvideos.csv")
-val USrdd = sc.textFile("hdfs:/user/agnucci/datasets/youtube-new/USvideos.csv")
-val bigRdd = sc.union(Seq(CArdd, DErdd, FRrdd, GBrdd, INrdd, JPrdd, KRrdd, MXrdd, RUrdd, USrdd))
-val schema = new StructType()
-  .add(StructField("video_id", StringType, true))
-  .add(StructField("trending_date", StringType, true))
-  .add(StructField("title", StringType, true))
-  .add(StructField("channel_title", StringType, true))
-  .add(StructField("category_id", IntegerType, true))
-  .add(StructField("publish_time", StringType, true))
-  .add(StructField("tags", StringType, true))
-  .add(StructField("views", LongType, true))
-  .add(StructField("likes", LongType, true))
-  .add(StructField("dislikes", LongType, true))
-  .add(StructField("comment_count", LongType, true))
-  .add(StructField("thumbnail_link", StringType, true))
-  .add(StructField("comments_disabled", BooleanType, true))
-  .add(StructField("ratings_disabled", BooleanType, true))
-  .add(StructField("video_error_or_removed", BooleanType, true))
-  .add(StructField("description", StringType, true))
-val outputRdd = bigRdd.coalesce(1)
-spark.createDataFrame(outputRdd, schema).write.parquet("hdfs:/user/agnucci/datasets/youtubeDataset")
+import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType,LongType, BooleanType};
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+val CAdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/CAvideos.csv")
+val DEdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/DEvideos.csv")
+val FRdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/FRvideos.csv")
+val GBdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/GBvideos.csv")
+val INdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/INvideos.csv")
+val JPdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/JPvideos.csv")
+val KRdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/KRvideos.csv")
+val MXdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/MXvideos.csv")
+val RUdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/RUvideos.csv")
+val USdf = spark.read.option("header", "true").option("delimiter", ",").option("inferSchema", "true").csv("hdfs:/user/agnucci/datasets/youtube-new/USvideos.csv")
+
+val bigDf1 = CAdf.unionAll(DEdf.unionAll(FRdf.unionAll(GBdf.unionAll(USdf))))
+//val bigDf2 = INdf.unionAll(JPdf.unionAll(MXdf.unionAll(MXdf.unionAll(RUdf)))) //il problema è JP con MX e anche KR con MX
+/*val bigDf1Corrected = bigDf2.withColumn("comments_disabled", $"comments_disabled".cast(StringType))
+    .withColumn("ratings_disabled", $"ratings_disabled".cast(StringType))
+    .withColumn("video_error_or_removed", $"video_error_or_removed".cast(StringType))
+    */
+//val bigDf = bigDf2.unionAll(bigDf2)
+
+val outputDf = bigDf1.coalesce(1);
+outputDf.write.parquet("hdfs:/user/agnucci/datasets/youtubeDataset")
