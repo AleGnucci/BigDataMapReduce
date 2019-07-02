@@ -20,7 +20,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
         //List<String> record = extractRecord(value);
-        String[] tags = value.getString("tags", 0).split("\\|"); //TODO: indexOutOfBoundsException
+        String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
         for (String tag : tags) {
             String doesVideoHaveErrors = value.getString("video_error_or_removed", 0);
             if(doesVideoHaveErrors.equals("False") || doesVideoHaveErrors.equals("FALSE")){
@@ -48,6 +48,10 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
         return record;
     }
     */
+
+    private String correctTags(String tags) {
+        return tags.replaceAll("|\"\"", "|\"").replaceAll("\"\"|", "\"|");
+    }
 
     /**
      * Parses the two dates and calculates the difference in days.

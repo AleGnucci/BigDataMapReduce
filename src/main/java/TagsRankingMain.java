@@ -1,4 +1,5 @@
 import helpers.CompositeLongWritable;
+import helpers.ParquetReadSupport;
 import job1.RankingCombiner;
 import job1.RankingMapper;
 import job1.RankingReducer;
@@ -48,6 +49,7 @@ public class TagsRankingMain {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
         job.setInputFormatClass(ExampleInputFormat.class);
+        //ParquetInputFormat.setReadSupportClass(job, ParquetReadSupport.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
         FileInputFormat.addInputPath(job, inputPath);

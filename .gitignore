@@ -217,3 +217,5 @@ spark-warehouse/
 
 # For SBT
 .jvmopts
+
+classes/
