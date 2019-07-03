@@ -21,7 +21,9 @@ public class RankingReducer extends Reducer<Text, TupleWritable, Text, Composite
             trendingTimeSum += getLongFromTupleWritable(compositeValue, 0);
             videosCount += getLongFromTupleWritable(compositeValue, 1);
         }
-        context.write(key, new CompositeLongWritable(trendingTimeSum/videosCount, videosCount));
+        if(values.iterator().hasNext()) {
+            context.write(key, new CompositeLongWritable(trendingTimeSum/videosCount, videosCount));
+        }
     }
 
     /**

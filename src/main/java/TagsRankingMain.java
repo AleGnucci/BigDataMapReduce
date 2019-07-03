@@ -8,8 +8,8 @@ import job2.KeyValueSwappingMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -21,6 +21,10 @@ public class TagsRankingMain {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
+        //enables LZO compression, saves time by reducing the amount of disk IO during the shuffle
+        conf.set("mapreduce.map.output.compress", "true");
+        conf.set("mapreduce.output.fileoutputformat.compress", "false");
+        //conf.set("mapred.max.split.size", "50000000");
         job1(conf, args);
         job2(conf, args);
     }
@@ -49,7 +53,7 @@ public class TagsRankingMain {
         job.setReducerClass(RankingReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
-        job.setMapOutputValueClass(LongWritable.class);
+        job.setMapOutputValueClass(TupleWritable.class);
         job.setInputFormatClass(ParquetInputFormat.class);
         ParquetInputFormat.setReadSupportClass(job, ParquetReadSupport.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);

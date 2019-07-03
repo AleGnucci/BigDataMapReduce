@@ -1,5 +1,7 @@
 package job1;
 
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.parquet.example.data.Group;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * inside that record.
  * The key is the tag and the value is the trending time, calculated by computing the difference between dates in days.
  * */
-public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritable> {
+public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritable> {
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
         //List<String> record = extractRecord(value);
@@ -31,23 +33,9 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, LongWritabl
             if(trendingTime == null) {
                 continue;
             }
-            context.write(new Text(tag), new LongWritable(trendingTime));
+            context.write(new Text(tag), new TupleWritable(new Writable[]{new LongWritable(trendingTime)}));
         }
     }
-
-    /**
-     * Returns the values of each field in the record.
-     * */
-    /*
-    private List<String> extractRecord(Group value){
-        String[] fields = value.toString().split("\n");
-        List<String> record = new ArrayList<>();
-        for (String field : fields) {
-            record.add(field.split(": ")[1]);
-        }
-        return record;
-    }
-    */
 
     private String correctTags(String tags) {
         return tags.replaceAll("|\"\"", "|\"").replaceAll("\"\"|", "\"|");
