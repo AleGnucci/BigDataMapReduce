@@ -21,6 +21,6 @@ public class RankingCombiner extends Reducer<Text, LongWritable, Text, TupleWrit
             trendingTimeSum += trendingTime.get();
         }
         context.write(key,
-                new TupleWritable(new Writable[]{new LongWritable(trendingTimeSum), new LongWritable(videosCount)}));
+                new TupleWritable(new Writable[]{new LongWritable(trendingTimeSum), new LongWritable(videosCount)})); //TODO: TupleWritable is not LongWritable
     }
 }

@@ -8,13 +8,14 @@ import job2.KeyValueSwappingMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
-import org.apache.parquet.hadoop.example.ExampleInputFormat;
+import org.apache.parquet.hadoop.ParquetInputFormat;
 
 public class TagsRankingMain {
 
@@ -48,8 +49,9 @@ public class TagsRankingMain {
         job.setReducerClass(RankingReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
-        job.setInputFormatClass(ExampleInputFormat.class);
-        //ParquetInputFormat.setReadSupportClass(job, ParquetReadSupport.class);
+        job.setMapOutputValueClass(LongWritable.class);
+        job.setInputFormatClass(ParquetInputFormat.class);
+        ParquetInputFormat.setReadSupportClass(job, ParquetReadSupport.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
         FileInputFormat.addInputPath(job, inputPath);
