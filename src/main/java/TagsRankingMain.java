@@ -24,7 +24,6 @@ public class TagsRankingMain {
         //enables LZO compression, saves time by reducing the amount of disk IO during the shuffle
         conf.set("mapreduce.map.output.compress", "true");
         conf.set("mapreduce.output.fileoutputformat.compress", "false");
-        //conf.set("mapred.max.split.size", "50000000");
         job1(conf, args);
         job2(conf, args);
     }
@@ -32,24 +31,18 @@ public class TagsRankingMain {
     /**
      * This is the main job and the first to be executed: it calculates the required result, but does not sort it.
     * */
-    private static void job1(Configuration conf, String[] args) throws Exception{
+    private static void job1(Configuration conf, String[] args) throws Exception{ //TODO: job1 deletes the outputPath but then doesn't recreate it for the job2
         Job job = Job.getInstance(conf, "job that calculates the required information about the tags");
 
-        Path inputPath = new Path(args[0]), outputPath = new Path(args[1]);
+        Path inputPath = new Path(args[0]), tempPath = getTempPath(args);
         FileSystem fs = FileSystem.get(new Configuration());
-        if (fs.exists(outputPath)) {
-            fs.delete(outputPath, true);
+        if (fs.exists(tempPath)) {
+            fs.delete(tempPath, true);
         }
 
         job.setJarByClass(TagsRankingMain.class);
         job.setMapperClass(RankingMapper.class);
         job.setCombinerClass(RankingCombiner.class);
-
-        if(args.length>2){
-            if(Integer.parseInt(args[2])>=0){
-                job.setNumReduceTasks(Integer.parseInt(args[2]));
-            }
-        }
         job.setReducerClass(RankingReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
@@ -59,21 +52,20 @@ public class TagsRankingMain {
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
 
         FileInputFormat.addInputPath(job, inputPath);
-        FileOutputFormat.setOutputPath(job, new Path(outputPath, "out1"));
+        FileOutputFormat.setOutputPath(job, tempPath);
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        job.waitForCompletion(true);
     }
 
     /**
      * This job gets executed after the first one and it just sorts the results using the videos count.
      * */
     private static void job2(Configuration conf, String[] args) throws Exception {
-        Path outputPath = new Path(args[1]);
+        Path tempPath = getTempPath(args), outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(new Configuration());
         if (fs.exists(outputPath)) {
             fs.delete(outputPath, true);
         }
-
         Job job2 = Job.getInstance(conf, "sorting job");
         job2.setJarByClass(TagsRankingMain.class);
         job2.setMapperClass(KeyValueSwappingMapper.class); //mapper that swaps keys with values
@@ -83,8 +75,13 @@ public class TagsRankingMain {
         job2.setOutputKeyClass(CompositeLongWritable.class);
         job2.setOutputValueClass(Text.class);
         job2.setInputFormatClass(SequenceFileInputFormat.class);
-        FileInputFormat.addInputPath(job2, new Path(outputPath, "out1"));
+
+        FileInputFormat.addInputPath(job2, tempPath);
         FileOutputFormat.setOutputPath(job2, outputPath);
         System.exit(job2.waitForCompletion(true) ? 0 : 1);
+    }
+
+    private static Path getTempPath(String[] args) {
+        return new Path(args[1]).getParent().suffix("/temp");
     }
 }
