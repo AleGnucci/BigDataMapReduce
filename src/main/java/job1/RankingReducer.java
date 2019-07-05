@@ -13,6 +13,7 @@ import java.io.IOException;
  * */
 public class RankingReducer extends Reducer<Text, TupleWritable, Text, CompositeLongWritable> {
 
+    @Override
     public void reduce(Text key, Iterable<TupleWritable> values, Context context)
             throws IOException, InterruptedException {
         long videosCount = 0;
