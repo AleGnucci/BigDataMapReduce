@@ -14,7 +14,7 @@ import java.io.IOException;
 public class RankingReducer extends Reducer<Text, TupleWritable, Text, CompositeLongWritable> {
 
     @Override
-    public void reduce(Text key, Iterable<TupleWritable> values, Context context)
+    public void reduce(Text key, Iterable<TupleWritable> values, Context context) //TODO: reducer outputs 0 records
             throws IOException, InterruptedException {
         long videosCount = 0;
         long trendingTimeSum = 0;

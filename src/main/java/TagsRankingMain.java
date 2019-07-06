@@ -62,7 +62,7 @@ public class TagsRankingMain {
     /**
      * This job gets executed after the first one and it just sorts the results using the videos count.
      * */
-    private static void job2(Configuration conf, String[] args) throws Exception { //TODO: job2 writes an empty output file
+    private static void job2(Configuration conf, String[] args) throws Exception {
         Path tempPath = getTempPath(args), outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(new Configuration());
         if (fs.exists(outputPath)) {

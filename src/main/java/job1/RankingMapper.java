@@ -21,11 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritable> {
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-        //List<String> record = extractRecord(value);
         String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
         for (String tag : tags) {
-            String doesVideoHaveErrors = value.getString("video_error_or_removed", 0);
-            if(doesVideoHaveErrors.equals("False") || doesVideoHaveErrors.equals("FALSE")){
+            boolean videoHasErrors = value.getString("video_error_or_removed", 0)
+                    .toLowerCase().equals("true");
+            if(videoHasErrors){
                 continue;
             }
             Long trendingTime = calculateTrendingTime(value.getString("publish_time", 0),
@@ -38,7 +38,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritab
     }
 
     private String correctTags(String tags) {
-        return tags.replaceAll("|\"\"", "|\"").replaceAll("\"\"|", "\"|");
+        return tags.replaceAll("\\|\"\"", "\\|\"").replaceAll("\"\"\\|", "\"\\|");
     }
 
     /**
