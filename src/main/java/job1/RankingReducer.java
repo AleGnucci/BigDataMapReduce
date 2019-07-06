@@ -5,7 +5,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.hadoop.mapreduce.Reducer;
-
 import java.io.IOException;
 
 /**
@@ -20,7 +19,7 @@ public class RankingReducer extends Reducer<Text, TupleWritable, Text, Composite
         long trendingTimeSum = 0;
         for (TupleWritable compositeValue : values) {
             trendingTimeSum += getLongFromTupleWritable(compositeValue, 0);
-            videosCount += getLongFromTupleWritable(compositeValue, 1);
+            videosCount += getLongFromTupleWritable(compositeValue, 1); //questo vale sempre 0
         }
         if(values.iterator().hasNext()) {
             context.write(key, new CompositeLongWritable(trendingTimeSum/videosCount, videosCount));

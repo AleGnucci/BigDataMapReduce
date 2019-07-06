@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * inside that record.
  * The key is the tag and the value is the trending time, calculated by computing the difference between dates in days.
  * */
-public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritable> {
+public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritable> { //TODO: usa GenericTwoLongWritable al posto di TupleWritable in output
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
         String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
