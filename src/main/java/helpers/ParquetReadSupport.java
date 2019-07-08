@@ -5,6 +5,9 @@ import org.apache.parquet.hadoop.api.DelegatingReadSupport;
 import org.apache.parquet.hadoop.api.InitContext;
 import org.apache.parquet.hadoop.example.GroupReadSupport;
 
+/**
+ * Class needed to read Parquet files in mapreduce.
+ * */
 public class ParquetReadSupport extends DelegatingReadSupport<Group> {
 
     public ParquetReadSupport() {

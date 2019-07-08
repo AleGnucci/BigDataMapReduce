@@ -4,13 +4,12 @@ import job1.RankingCombiner;
 import job1.RankingMapper;
 import job1.RankingReducer;
 import job2.BasicReducer;
-import job2.CompositeLongComparator;
+import job2.CompositeLongDescendingComparator;
 import job2.KeyValueSwappingMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.join.TupleWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -48,7 +47,7 @@ public class TagsRankingMain {
         job.setReducerClass(RankingReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(CompositeLongWritable.class);
-        job.setMapOutputValueClass(TupleWritable.class);
+        job.setMapOutputValueClass(CompositeLongWritable.class);
         job.setInputFormatClass(ParquetInputFormat.class);
         ParquetInputFormat.setReadSupportClass(job, ParquetReadSupport.class);
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
@@ -75,7 +74,7 @@ public class TagsRankingMain {
         job2.setReducerClass(BasicReducer.class);
         job2.setNumReduceTasks(1); //sets only one reducer, so there is only one output file
         //sorts the key-value pairs before they arrive to the reducer
-        job2.setSortComparatorClass(CompositeLongComparator.class);
+        job2.setSortComparatorClass(CompositeLongDescendingComparator.class);
         job2.setOutputKeyClass(CompositeLongWritable.class);
         job2.setOutputValueClass(Text.class);
         job2.setInputFormatClass(SequenceFileInputFormat.class);

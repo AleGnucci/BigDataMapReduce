@@ -7,7 +7,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 
 /**
- * Simple mapper that swaps keys with values and viceversa.
+ * Simple mapper that swaps keys with values and vice versa.
  * */
 public class KeyValueSwappingMapper extends Mapper<Text, CompositeLongWritable, CompositeLongWritable, Text> {
 

@@ -1,7 +1,6 @@
 package job1;
 
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.join.TupleWritable;
+import helpers.CompositeLongWritable;
 import org.apache.parquet.example.data.Group;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * inside that record.
  * The key is the tag and the value is the trending time, calculated by computing the difference between dates in days.
  * */
-public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritable> { //TODO: usa GenericTwoLongWritable al posto di TupleWritable in output
+public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLongWritable> {
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
         String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
@@ -33,7 +32,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, TupleWritab
             if(trendingTime == null) {
                 continue;
             }
-            context.write(new Text(tag), new TupleWritable(new Writable[]{new LongWritable(trendingTime)}));
+            context.write(new Text(tag), new CompositeLongWritable(trendingTime, 1));
         }
     }
 
