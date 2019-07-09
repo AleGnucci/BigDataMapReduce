@@ -1,9 +1,10 @@
 import helpers.CompositeLongWritable;
+import helpers.OutputSchema;
 import helpers.ParquetReadSupport;
 import job1.RankingCombiner;
 import job1.RankingMapper;
 import job1.RankingReducer;
-import job2.BasicReducer;
+import job2.BasicParquetReducer;
 import job2.CompositeLongDescendingComparator;
 import job2.KeyValueSwappingMapper;
 import org.apache.hadoop.conf.Configuration;
@@ -15,7 +16,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.parquet.avro.AvroParquetOutputFormat;
 import org.apache.parquet.hadoop.ParquetInputFormat;
 
 public class TagsRankingMain {
@@ -70,15 +71,16 @@ public class TagsRankingMain {
         Job job2 = Job.getInstance(conf, "sorting job");
         job2.setJarByClass(TagsRankingMain.class);
         job2.setMapperClass(KeyValueSwappingMapper.class); //mapper that swaps keys with values
-        //simple reducer that outputs its inputs, so the keys get sorted before it
-        job2.setReducerClass(BasicReducer.class);
+        //simple reducer that outputs its inputs as parquet records
+        job2.setReducerClass(BasicParquetReducer.class);
         job2.setNumReduceTasks(1); //sets only one reducer, so there is only one output file
         //sorts the key-value pairs before they arrive to the reducer
         job2.setSortComparatorClass(CompositeLongDescendingComparator.class);
         job2.setOutputKeyClass(CompositeLongWritable.class);
         job2.setOutputValueClass(Text.class);
         job2.setInputFormatClass(SequenceFileInputFormat.class);
-        job2.setOutputFormatClass(TextOutputFormat.class);
+        job2.setOutputFormatClass(AvroParquetOutputFormat.class);
+        AvroParquetOutputFormat.setSchema(job2, OutputSchema.getSchema());
 
         FileInputFormat.addInputPath(job2, tempPath);
         FileOutputFormat.setOutputPath(job2, outputPath);
