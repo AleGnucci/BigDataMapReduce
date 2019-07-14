@@ -16,5 +16,5 @@ hdfs dfs -du -s /user/agnucci/outputMR
 //ottenere la prima riga dal file di output
 hadoop fs -cat /user/agnucci/outputMR/part-r-00000 | head
 
-//ottenere i logs del job(l'app id va preso dalla shell, dpopo aver pfatto partire il job):
+//ottenere i logs del job(l'app id va preso dalla shell, dpopo aver fatto partire il job):
  yarn logs -applicationId application_1560510165054_0853

@@ -22,8 +22,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
         String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
         for (String tag : tags) {
-            boolean videoHasErrors = value.getString("video_error_or_removed", 0)
-                    .toLowerCase().equals("true");
+            boolean videoHasErrors = value.getBoolean("video_error_or_removed", 0);
             if(videoHasErrors){
                 continue;
             }
