@@ -10,6 +10,9 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Simple reducer that outputs the input k-v pairs as parquet records.
+ * */
 public class BasicParquetReducer extends Reducer<CompositeLongWritable, Text, Void, GenericRecord> {
 
     private GenericRecord record = new GenericData.Record(OutputSchema.getSchema());
