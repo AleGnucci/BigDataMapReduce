@@ -8,7 +8,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Simple reducer that outputs the input k-v pairs as parquet records.
@@ -20,11 +19,15 @@ public class BasicParquetReducer extends Reducer<CompositeLongWritable, Text, Vo
     @Override
     protected void reduce(CompositeLongWritable key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException {
-        List<String> fieldNames = OutputSchema.getFieldNames();
+        String fieldName1 = OutputSchema.getFieldNames().get(0);
+        String fieldName2 = OutputSchema.getFieldNames().get(1);
+        String fieldName3 = OutputSchema.getFieldNames().get(2);
+        long firstKeyValue = key.getFirstValue();
+        long secondKeyValue = key.getSecondValue();
         for (Text value : values) {
-            record.put(fieldNames.get(0), value.toString());
-            record.put(fieldNames.get(1), key.getFirstValue());
-            record.put(fieldNames.get(2), key.getSecondValue());
+            record.put(fieldName1, value.toString());
+            record.put(fieldName2, firstKeyValue);
+            record.put(fieldName3, secondKeyValue);
             context.write(null, record);
         }
     }

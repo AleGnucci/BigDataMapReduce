@@ -23,7 +23,7 @@ public class TagsRankingMain {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        //enables LZO compression, saves time by reducing the amount of disk IO during the shuffle
+        //enables map output compression, saves time by reducing the amount of IO during the shuffle
         conf.set("mapreduce.map.output.compress", "true");
         conf.set("mapreduce.output.fileoutputformat.compress", "false");
         job1(conf, args);

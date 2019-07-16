@@ -1,5 +1,6 @@
 package job1;
 
+import helpers.CompositeLong;
 import helpers.CompositeLongWritable;
 import org.apache.parquet.example.data.Group;
 import org.apache.hadoop.io.LongWritable;
@@ -20,37 +21,25 @@ import java.util.concurrent.TimeUnit;
 public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLongWritable> {
 
     public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-        String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
-        for (String tag : tags) {
-            boolean videoHasErrors = value.getBoolean("video_error_or_removed", 0);
-            if(videoHasErrors){
-                continue;
-            }
-            Long trendingTime = calculateTrendingTime(value.getString("publish_time", 0),
-                    value.getString("trending_date", 0));
-            if(trendingTime == null) {
-                continue;
-            }
-            context.write(new Text(tag), new CompositeLongWritable(trendingTime, 1));
+        if(value.getBoolean("video_error_or_removed", 0)) {
+            return;
         }
-    }
-
-    private String correctTags(String tags) {
-        return tags.replaceAll("\\|\"\"", "\\|\"").replaceAll("\"\"\\|", "\"\\|");
+        Long trendingTime;
+        try {
+            trendingTime = calculateTrendingTime(value.getString("publish_time", 0),
+                    value.getString("trending_date", 0));
+        } catch (ParseException exception) {
+            return;
+        }
+        splitTagsAndWriteOutput(value, context, trendingTime);
     }
 
     /**
      * Parses the two dates and calculates the difference in days.
      * */
-    private Long calculateTrendingTime(String publishTimeString, String trendingTimeString) {
-        Date publishTime;
-        Date trendingDate;
-        try {
-            publishTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(publishTimeString);
-            trendingDate = new SimpleDateFormat("yy.dd.MM").parse(trendingTimeString);
-        } catch (ParseException e) {
-            return null;
-        }
+    private Long calculateTrendingTime(String publishTimeString, String trendingTimeString) throws ParseException {
+        Date publishTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").parse(publishTimeString);
+        Date trendingDate = new SimpleDateFormat("yy.dd.MM").parse(trendingTimeString);
         return dateDaysDifference(publishTime, trendingDate);
     }
 
@@ -61,4 +50,24 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
         long millisecondsDifference = Math.abs(afterDate.getTime() - beforeDate.getTime());
         return TimeUnit.DAYS.convert(millisecondsDifference, TimeUnit.MILLISECONDS);
     }
+
+    /**
+     * Removes the double quotation marks from the tags, then splits them and outputs for each tag the composite value.
+     * */
+    private void splitTagsAndWriteOutput(Group value, Context context, Long trendingTime)
+            throws IOException, InterruptedException {
+        String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
+        CompositeLongWritable compositeValue = new CompositeLongWritable(trendingTime, 1);
+        for (String tag : tags) {
+            context.write(new Text(tag), compositeValue);
+        }
+    }
+
+    /**
+     * Removes the double quotation marks from the specified tags string.
+     * */
+    private String correctTags(String tags) {
+        return tags.replaceAll("\\|\"\"", "\\|\"").replaceAll("\"\"\\|", "\"\\|");
+    }
+
 }
