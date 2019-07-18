@@ -10,7 +10,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,13 +55,15 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
     }
 
     /**
-     * Removes the double quotation marks from the tags, then splits them and outputs for each tag the composite value.
+     * Removes the double quotation marks from the tags and converts them to lowercase,
+     * then splits them, removes duplicates and outputs for each tag the composite value.
      * */
     private void splitTagsAndWriteOutput(Group value, Context context, Long trendingTime)
             throws IOException, InterruptedException {
-        String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
+        String[] tags = correctTags(value.getString("tags", 0)).toLowerCase().split("\\|");
+        Set<String> tagsWithoutDuplicates = new HashSet<>(Arrays.asList(tags));
         CompositeLongWritable compositeValue = new CompositeLongWritable(trendingTime, 1);
-        for (String tag : tags) {
+        for (String tag : tagsWithoutDuplicates) {
             context.write(new Text(tag), compositeValue);
         }
     }
