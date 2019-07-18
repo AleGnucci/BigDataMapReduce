@@ -32,6 +32,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
             trendingTime = calculateTrendingTime(value.getString("publish_time", 0),
                     value.getString("trending_date", 0));
         } catch (ParseException exception) {
+            System.out.println("launching exception");
             return;
         }
         splitTagsAndWriteOutput(value, context, trendingTime);
@@ -50,8 +51,7 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
      * Calculates the date difference in days.
      * */
     private long dateDaysDifference(Date beforeDate, Date afterDate) {
-        long millisecondsDifference = Math.abs(afterDate.getTime() - beforeDate.getTime());
-        return TimeUnit.DAYS.convert(millisecondsDifference, TimeUnit.MILLISECONDS);
+        return TimeUnit.DAYS.convert(afterDate.getTime() - beforeDate.getTime(), TimeUnit.MILLISECONDS);
     }
 
     /**
