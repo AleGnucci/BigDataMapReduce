@@ -8,11 +8,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 /**
- * Writable that contains two long fields. Comparisons on objects of this type are done using only the second field.
+ * Writable that contains two long fields. Comparisons on objects of this type are done using the second field first,
+ * if equal then then the first value is also used.
  * */
 public class CompositeLongWritable implements WritableComparable<CompositeLong>, CompositeLong {
     private long value1 = 0;
-    private long value2 = 0; //to sort objects of this type only this field is used
+    private long value2 = 0;
 
     public CompositeLongWritable(){}
 
@@ -39,8 +40,9 @@ public class CompositeLongWritable implements WritableComparable<CompositeLong>,
     }
 
     @Override
-    public int compareTo(CompositeLong compositeLong) {
-        return (Long.compare(value2, compositeLong.getSecondValue()));
+    public int compareTo(CompositeLong compositeLong) { //sorts using value2 first, if equal then uses also value1
+        int value2Comparison = Long.compare(value2, compositeLong.getSecondValue());
+        return (value2Comparison == 0 ? Long.compare(value1, compositeLong.getFirstValue()) : value2Comparison);
     }
 
     @Override

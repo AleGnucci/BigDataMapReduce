@@ -15,13 +15,14 @@ import java.io.IOException;
 public class BasicParquetReducer extends Reducer<CompositeLongWritable, Text, Void, GenericRecord> {
 
     private GenericRecord record = new GenericData.Record(OutputSchema.getSchema());
+    private String fieldName1 = OutputSchema.getFieldNames().get(0);
+    private String fieldName2 = OutputSchema.getFieldNames().get(1);
+    private String fieldName3 = OutputSchema.getFieldNames().get(2);
 
     @Override
     protected void reduce(CompositeLongWritable key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException {
-        String fieldName1 = OutputSchema.getFieldNames().get(0);
-        String fieldName2 = OutputSchema.getFieldNames().get(1);
-        String fieldName3 = OutputSchema.getFieldNames().get(2);
+
         long firstKeyValue = key.getFirstValue();
         long secondKeyValue = key.getSecondValue();
         for (Text value : values) {
