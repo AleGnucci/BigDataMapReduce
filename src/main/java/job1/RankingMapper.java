@@ -10,10 +10,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -55,13 +52,14 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
     }
 
     /**
-     * Removes the double quotation marks from the tags and converts them to lowercase,
+     * Removes the quotation marks from the tags and converts them to lowercase,
      * then splits them, removes duplicates and outputs for each tag the composite value.
      * */
     private void splitTagsAndWriteOutput(Group value, Context context, Long trendingTime)
             throws IOException, InterruptedException {
-        String[] tags = correctTags(value.getString("tags", 0)).toLowerCase().split("\\|");
-        Set<String> tagsWithoutDuplicates = new HashSet<>(Arrays.asList(tags));
+        String[] tags = correctTags(value.getString("tags", 0)).split("\\|");
+        List<String> tagList = Arrays.asList(tags);
+        Set<String> tagsWithoutDuplicates = new HashSet<>(tagList);
         CompositeLongWritable compositeValue = new CompositeLongWritable(trendingTime, 1);
         for (String tag : tagsWithoutDuplicates) {
             context.write(new Text(tag), compositeValue);
@@ -69,10 +67,14 @@ public class RankingMapper extends Mapper<LongWritable, Group, Text, CompositeLo
     }
 
     /**
-     * Removes the double quotation marks from the specified tags string.
+     * Removes the quotation marks from the tags string. It is the same as this:
+     * tags.toLowerCase.replaceAll("\\|\"\"\"", "\\|").replaceAll("\"\"\"\\|", "\\|")
+     * .replaceAll("\\|\"\"", "\\|").replaceAll("\"\"\\|", "\\|")
+     * .replaceAll("\\|\"", "\\|").replaceAll("\"\\|", "\\|")
      * */
     private String correctTags(String tags) {
-        return tags.replaceAll("\\|\"\"", "\\|\"").replaceAll("\"\"\\|", "\"\\|");
+        return tags.toLowerCase()
+                .replaceAll("[\\|\"\"|\"\"\\||\\|\"|\"\\||\\|\"\"\"|\"\"\"\\|]", "\\|");
     }
 
 }
