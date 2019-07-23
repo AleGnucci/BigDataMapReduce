@@ -73,7 +73,7 @@ public class TagsRankingMain {
         Job job2 = Job.getInstance(conf, "sorting job");
         job2.setJarByClass(TagsRankingMain.class);
         job2.setMapperClass(KeyValueSwappingMapper.class); //mapper that swaps keys with values
-        //simple reducer that outputs its inputs as parquet records
+        //simple reducer that outputs its inputs as csv lines
         job2.setReducerClass(BasicCsvReducer.class);
         job2.setNumReduceTasks(1); //sets only one reducer, so there is only one output file
         //sorts the key-value pairs before they arrive to the reducer
