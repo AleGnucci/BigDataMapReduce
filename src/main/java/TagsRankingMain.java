@@ -1,11 +1,9 @@
 import helpers.CompositeLongWritable;
-import helpers.OutputSchema;
 import helpers.ParquetReadSupport;
 import job1.RankingCombiner;
 import job1.RankingMapper;
 import job1.RankingReducer;
 import job2.BasicCsvReducer;
-import job2.BasicParquetReducer;
 import job2.CompositeLongDescendingComparator;
 import job2.KeyValueSwappingMapper;
 import org.apache.hadoop.conf.Configuration;
@@ -22,6 +20,8 @@ import org.apache.parquet.hadoop.ParquetInputFormat;
 
 public class TagsRankingMain {
 
+    //launch this with:
+    // hadoop jar Job1MapReduce.main.jar TagsRankingMain /user/agnucci/datasets/youtubeDataset /user/agnucci/outputMR
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         //enables map output compression, saves time by reducing the amount of IO during the shuffle
@@ -58,7 +58,9 @@ public class TagsRankingMain {
         FileInputFormat.addInputPath(job, inputPath);
         FileOutputFormat.setOutputPath(job, tempPath);
 
-        job.waitForCompletion(true);
+        if (!job.waitForCompletion(true)) {
+            System.exit(1);
+        }
     }
 
     /**

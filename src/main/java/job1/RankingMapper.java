@@ -1,6 +1,5 @@
 package job1;
 
-import helpers.CompositeLong;
 import helpers.CompositeLongWritable;
 import org.apache.parquet.example.data.Group;
 import org.apache.hadoop.io.LongWritable;
